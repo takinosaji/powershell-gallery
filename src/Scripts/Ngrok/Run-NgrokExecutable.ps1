@@ -34,7 +34,7 @@ $ngrokArchFullPath = "$PSScriptRoot\ngrok.zip"
 
 if (-not (Test-Path $ngrokExeFullPath)) {
     Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile $ngrokArchFullPath @commonParams
-    Expand-Archive -Path $ngrokArchFullPath -DestinationPath $PSScriptRoot
+    Expand-Archive -Path $ngrokArchFullPath -DestinationPath $PSScriptRoot @commonParams
 }
 
 &$ngrokExeFullPath http $TunnelPort

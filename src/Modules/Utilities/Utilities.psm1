@@ -7,6 +7,25 @@
 #---------------------------------------
 #----PUBLIC-----------------------------
 #--------------------------------------- 
+function Get-BasicAuthHeader {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$Login,
+        [Parameter(Mandatory=$true)]
+        [string]$Password
+    )
+    Begin {}
+    Process {
+        $pair = "$($Login):$($Password)"
+        $encodedCreds = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($pair))
+        return "Basic $encodedCreds"
+    }
+    End {}
+}
+
+
+
 function Invoke-CmdCommand {
     [CmdletBinding()]
     param(
@@ -84,5 +103,6 @@ function Retry-ScriptBlock {
 #---------------------------------------
 #----EXPORTS----------------------------
 #---------------------------------------
+Export-ModuleMember -Function Get-BasicAuthHeader
 Export-ModuleMember -Function Invoke-CmdCommand
 Export-ModuleMember -Function Retry-ScriptBlock

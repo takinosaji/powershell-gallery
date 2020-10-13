@@ -10,9 +10,11 @@
 function Get-BasicAuthHeader {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true, ParameterSetName = "Normal")]
+        [Parameter(ParameterSetName = "NoLogin")]
         [string]$Login,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true, ParameterSetName = "Normal")]
+        [Parameter(Mandatory=$true, ParameterSetName = "NoLogin")]
         [string]$Password
     )
     Begin {}

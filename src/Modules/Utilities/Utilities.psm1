@@ -102,9 +102,56 @@ function Retry-ScriptBlock {
 
 
  
+function Merge-HashTables {
+    [CmdletBinding()]
+    param(
+        [hashtable[]]$Hashtables,
+        [switch]$Override
+    )
+
+    if ($Hashtables.Count -eq 1) {
+        return $Hashtables[0]
+    }
+
+    $resultHashtable = @{}
+    
+    for ($i = 0; $i -lt $Hashtables.Count; $i++) {
+        $currentHashtableClone = $Hashtables[$i].Clone()
+
+        foreach ($key in $Hashtables[$i].Keys) {
+
+            if ($resultHashtable.ContainsKey($key)) {
+
+                if (!$Override -and 
+                    ($resultHashtable[$key] -is [System.Collections.IEnumerable]) -and 
+                    ($currentHashtableClone[$key] -is [System.Collections.IEnumerable])) {
+
+                    if (($resultHashtable[$key] -is [System.Collections.Hashtable]) -and 
+                        ($currentHashtableClone[$key] -is [System.Collections.Hashtable])) {
+                        $resultHashtable[$key] = Merge-HashTables @($resultHashtable[$key], $currentHashtableClone[$key])    
+                    } else {
+                        $resultHashtable[$key] += $currentHashtableClone[$key]
+                    }
+
+                    $currentHashtableClone.Remove($key)
+                } else {
+                    $resultHashtable.Remove($key)
+                }
+            }
+        }
+
+        $resultHashtable += $currentHashtableClone
+    }
+
+    return $resultHashtable
+}
+
+
+
 #---------------------------------------
 #----EXPORTS----------------------------
 #---------------------------------------
 Export-ModuleMember -Function Get-BasicAuthHeader
 Export-ModuleMember -Function Invoke-CmdCommand
 Export-ModuleMember -Function Retry-ScriptBlock
+Export-ModuleMember -Function Merge-HashTables

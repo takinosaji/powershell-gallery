@@ -35,8 +35,8 @@ function Invoke-CmdCommand {
         $ScriptBlock,
         [Parameter(Mandatory = $false)]
         [int[]]$AllowedExitCodes,
-        [Parameter(Mandatory = $false)]
-        [switch]$AllowErrors
+        [switch]$AllowErrors,
+        [switch]$Interactive
     )
  
     begin {
@@ -44,8 +44,22 @@ function Invoke-CmdCommand {
             'ErrorAction' = $ErrorActionPreference;
             'Verbose' = $VerbosePreference -ne 'SilentlyContinue'
         }
+
+        $isNonInteractiveMode = [bool]([Environment]::GetCommandLineArgs() -like '-noni*')
     }
     process {
+        trap {
+            if (!$isNonInteractiveMode -and $Interactive) {
+                $_ | Out-Default
+                $userinput = Read-Host -Prompt 'An error has occured. Type "Yes" if you want to continue. Any other input is considered as "No" and will cause trmination error"'
+                if ($userinput -eq 'yes') {
+                    continue
+                }
+            }
+
+            break
+        }
+
         "Executing: $ScriptBlock" | Write-Verbose
         Invoke-Command -scriptblock $ScriptBlock @commonParams | Tee-Object -Variable output | Out-Default
         if ($LASTEXITCODE -ne 0) {

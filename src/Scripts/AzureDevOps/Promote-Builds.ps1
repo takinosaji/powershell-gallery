@@ -15,7 +15,7 @@
 #>
 <#
 .DESCRIPTION
- This script allows you to enrich builds with specific tags in your AzureDevops
+ This script allows you to retain and enrich builds with specific tags in your AzureDevOps
 #>
 [CmdletBinding()]
 param (
@@ -149,7 +149,10 @@ function Process-Candidate {
                               @commonParams
 
     if ($foundBuilds.count -eq 0) {
-        throw "Suitable builds for promotion has not been found for the following candidate: $($Candidate | ConvertTo-Json)"
+        return @{
+            Candidate = $Candidate
+            Actions = @("Suitable builds for promotion has not been found for the following candidate")
+        }
     }
 
     $latestBuild = $foundBuilds.value[0]

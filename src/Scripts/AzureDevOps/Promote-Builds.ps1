@@ -101,14 +101,14 @@ function Process-Tag {
     if ($TagConfig.ThrowIfExists -eq $true -and $tagExists -eq $true) {
         throw "$($BuildInfo.buildNumber) already has tag $($TagConfig.Value) set and condition ThrowIfExists is set to `$true"
     } elseif ($tagExists) {
-        return "Tag `'$($TagConfig.Value)`' has not been added because has been already set"
+        return "Tag $($TagConfig.Value) has not been added because has been already set"
     }
 
     $cancelingMet = 
         ($BuildInfo.tags | ? { $TagConfig.CancelingTags -contains $_ }).Count -gt 0
    
     if ($cancelingMet) {
-        return "Tag `'$($TagConfig.Value)`' has not been added due to presence of canceling tags"
+        return "Tag $($TagConfig.Value) has not been added due to presence of canceling tags"
     }
 
     Tag-Build -RestApiUrl $RestApiUrl `
@@ -120,7 +120,7 @@ function Process-Tag {
               -Proxy $Proxy `
               @commonParams | Write-Verbose
        
-    return "Tag `'$($TagConfig.Value)`' has been added to the build"
+    return "Tag $($TagConfig.Value) has been added to the build"
 }
 
 function Process-Candidate {
@@ -157,47 +157,33 @@ function Process-Candidate {
 
     $latestBuild = $foundBuilds.value[0]
 
+    $result = @{
+        CandidateName = $Candidate.Name
+        BuildNumber = $latestBuild.buildNumber
+        Actions = @()
+    }
+
+    if (!$latestBuild.keepForever) {
+        Update-Build -RestApiUrl $RestApiUrl `
+                     -Collection $Collection `
+                     -Project $project `
+                     -BuildId $latestBuild.id `
+                     -UpdateParameters @{ keepForever = $true } `
+                     -Token $Token `
+                     -Proxy $Proxy `
+                     @commonParams | Write-Verbose
+        $result.Actions += "Build has retained"
+    } else {
+        $result.Actions += "Build is already retained"
+    }
+
     $Candidate.Tags | ForEach-Object {
         $tagConfig = if ($_ -is [string]) { (Get-DefaultTagConfig $_) } else { $_ }
 
-        $result = @{
-            CandidateName = $Candidate.Name
-            BuildNumber = $latestBuild.buildNumber
-            Actions = @()
-        }
-
-        if (!$latestBuild.keepForever) {
-            Update-Build -RestApiUrl $RestApiUrl `
-                         -Collection $Collection `
-                         -Project $project `
-                         -BuildId $latestBuild.id `
-                         -UpdateParameters @{ keepForever = $true } `
-                         -Token $Token `
-                         -Proxy $Proxy `
-                         @commonParams | Write-Verbose
-            $result.Actions += "Build has retained"
-        } else {
-            $result.Actions += "Build is already retained"
-        }
-        
-
         $result.Actions += Process-Tag $latestBuild $tagConfig @commonParams
-        $result
     }
 
-}
-
-function Print-Results {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$true)]
-        [hashtable[]]$Results
-    )
-
-    $Results | % {
-        $_ | Out-Host
-        @([string]::Concat([System.Linq.Enumerable]::Repeat("=", 25)), ("`n")) | Out-Default
-    }
+    $result
 }
 
 
@@ -213,7 +199,7 @@ $commonParams = @{
     Verbose = $VerbosePreference -ne 'SilentlyContinue'
 }
 
-@("Utilities", "AzureDevOps") | ForEach-Object {
+@("WK.Utilities", "WK.AzureDevOps") | ForEach-Object {
     "$PSScriptRoot/../../Modules/$_/$_.psd1" | 
         Import-Module -Force -Scope Global @commonParams 
 }
@@ -228,7 +214,7 @@ trap {
 }
 $results = $candidates | ForEach-Object { Process-Candidate $_ @commonParams }
 
-Print-Results $results @commonParams
+$results | ConvertTo-Json | Out-Host
 
            
 

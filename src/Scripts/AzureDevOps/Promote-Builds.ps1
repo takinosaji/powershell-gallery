@@ -213,8 +213,7 @@ trap {
     break;
 }
 $results = $candidates | ForEach-Object { Process-Candidate $_ @commonParams }
-
-$results | ConvertTo-Json | Out-Host
+$results
 
            
 

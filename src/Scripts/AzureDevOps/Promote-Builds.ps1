@@ -47,7 +47,7 @@ function Assemble-Candidates {
     )
 
     if (!$DataFilePaths -and !$DataObject) {
-        throw "No data file paths nor data object has been specified. Aborting processing."
+        throw "No data file paths nor data object have been specified. Aborting processing."
     }
     if ($DataFilePaths) {
         $localizedDatas = $DataFilePaths | % { 

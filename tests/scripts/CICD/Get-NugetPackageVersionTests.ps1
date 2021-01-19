@@ -1,7 +1,7 @@
 Describe "Get-GetNugetPackageVersion" {
     BeforeAll {
         $currentDate = Get-Date -AsUTC
-        $scriptFile = "$PSScriptRoot\..\..\..\src\scripts\CICD\Get-GetNugetPackageVersion.ps1"
+        $scriptFile = "$PSScriptRoot\..\..\..\src\scripts\CICD\Get-NugetPackageVersion.ps1"
     }
 
     It "Produces correct dev package version with PBI nubmer in branch name" {

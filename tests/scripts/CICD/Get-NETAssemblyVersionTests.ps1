@@ -1,7 +1,7 @@
 Describe "Get-GetNETAssemblyVersion" {
     BeforeAll {
         $currentDate = Get-Date -AsUTC
-        $scriptFile = "$PSScriptRoot\..\..\..\src\scripts\CICD\Get-GetNETAssemblyVersion.ps1"
+        $scriptFile = "$PSScriptRoot\..\..\..\src\scripts\CICD\Get-NETAssemblyVersion.ps1"
     }
 
     It "Produces correct .NET version out of dev package version" {

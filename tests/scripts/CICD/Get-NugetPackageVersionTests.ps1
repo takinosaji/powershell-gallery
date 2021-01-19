@@ -1,4 +1,4 @@
-Describe "Get-GetNugetPackageVersion" {
+Describe "Get-NugetPackageVersion" {
     BeforeAll {
         $currentDate = Get-Date -AsUTC
         $scriptFile = "$PSScriptRoot\..\..\..\src\scripts\CICD\Get-NugetPackageVersion.ps1"

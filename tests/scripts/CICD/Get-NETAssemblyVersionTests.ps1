@@ -1,4 +1,4 @@
-Describe "Get-GetNETAssemblyVersion" {
+Describe "Get-NETAssemblyVersion" {
     BeforeAll {
         $currentDate = Get-Date -AsUTC
         $scriptFile = "$PSScriptRoot\..\..\..\src\scripts\CICD\Get-NETAssemblyVersion.ps1"

@@ -26,4 +26,5 @@ param (
 )
 
 "$PackageVersion-$($CurrentBranchName -replace "[^a-zA-Z\d_]", "_")" |
+    % { $_ -replace "refs_heads_", "" } |
     % { $_ -replace "_{2,}", "_" }
